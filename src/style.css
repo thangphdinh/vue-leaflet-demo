@@ -1,0 +1,7 @@
+@import "leaflet/dist/leaflet.css";
+
+/* Custom styles */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+}
