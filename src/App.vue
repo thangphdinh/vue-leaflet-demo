@@ -64,7 +64,34 @@ const zoom = ref(13)
           <EgryiaMap height="600px" />
         </div>
 
+        <!-- Egryia Map Editor -->
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-xl p-6">
+          <div class="mb-4">
+            <h2 class="text-2xl font-semibold text-green-900 mb-2 flex items-center gap-2">
+              ✏️ Egryia Map Editor
+            </h2>
+            <p class="text-green-700 text-sm">
+              Click vào map để thêm markers, kéo thả để di chuyển, export ra JSON
+            </p>
+          </div>
 
+          <EgryiaMapEditor height="600px" />
+
+          <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-green-100 p-4 rounded-lg border-2 border-green-300">
+              <h3 class="font-semibold text-green-900 mb-1">Click To Add</h3>
+              <p class="text-sm text-green-800">Click anywhere to add marker</p>
+            </div>
+            <div class="bg-emerald-100 p-4 rounded-lg border-2 border-emerald-300">
+              <h3 class="font-semibold text-emerald-900 mb-1">Drag & Drop</h3>
+              <p class="text-sm text-emerald-800">Drag markers to adjust position</p>
+            </div>
+            <div class="bg-teal-100 p-4 rounded-lg border-2 border-teal-300">
+              <h3 class="font-semibold text-teal-900 mb-1">Export JSON</h3>
+              <p class="text-sm text-teal-800">Copy coordinates to clipboard</p>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
