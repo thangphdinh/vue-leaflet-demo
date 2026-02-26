@@ -28,6 +28,7 @@ onMounted(() => {
 
   // Setup map
   map = L.map(mapContainer.value, {
+    rotate: false,
     crs: L.CRS.Simple,
     // minZoom: 0
   })

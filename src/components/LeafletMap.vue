@@ -26,7 +26,7 @@ onMounted(() => {
   if (!mapContainer.value) return
 
   // Create map instance
-  map = L.map(mapContainer.value).setView(props.center, props.zoom)
+  map = L.map(mapContainer.value, { rotate: false }).setView(props.center, props.zoom)
 
   // Add OpenStreetMap tile layer
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
