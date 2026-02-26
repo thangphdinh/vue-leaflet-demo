@@ -73,6 +73,24 @@ const LANDMARK_COLORS: Record<string, string> = {
   'label': '#757575',
 }
 
+const CRANE_TYPES = new Set(['crane', 'qc-crane'])
+const CRANE_W = 18
+const CRANE_H = Math.round(CRANE_W * 402 / 144) // giữ tỷ lệ SVG gốc 144×402
+
+function makeCraneIcon(counterRotateDeg: number, scale = 1): L.DivIcon {
+  const [width, height] = [CRANE_W * scale, CRANE_H * scale]
+  return L.divIcon({
+    html: `<img src="/icons/sts_crane_icon.svg" class="crane-icon"
+               style="width:${width}px;height:${height}px;
+                      transform:rotate(${counterRotateDeg}deg);
+                      transform-origin:50% 100%;display:block">`,
+    className: '',
+    iconSize: [width, height],
+    iconAnchor: [width / 2, height / 1.6],
+    popupAnchor: [0, -height],
+  })
+}
+
 // ---------------------------------------------------------------------------
 // --- Style functions ---
 function styleBoundary(): L.PathOptions {
@@ -219,13 +237,35 @@ function toggleLayer(name: string) {
 }
 
 // --- Rotation ---
+function updateCraneRotations(delta: number) {
+  document.querySelectorAll<HTMLElement>('.crane-icon').forEach(el => {
+    const cur = parseFloat(el.getAttribute('data-rot') ?? '0')
+    const next = cur + delta
+    el.setAttribute('data-rot', String(next))
+    el.style.transform = `rotate(${next}deg)`
+  })
+}
+
 function setBearing(deg: number) {
+  const prevDeg = bearing.value
   bearing.value = (deg + 360) % 360
   map?.setBearing(bearing.value)
+  // Delta counter-rotation: accumulate small deltas to keep cranes upright on screen
+  let delta = bearing.value - prevDeg
+  if (delta > 180) delta -= 360   // handle wrap-around 355→5
+  if (delta < -180) delta += 360
+  updateCraneRotations(delta)
 }
 function rotateCW() { setBearing(bearing.value + 5) }
 function rotateCCW() { setBearing(bearing.value - 5) }
-function resetBearing() { setBearing(initialBearing) }
+function resetBearing() {
+  setBearing(initialBearing)
+  // Reset crane icons back to 0° (initial upright position)
+  document.querySelectorAll<HTMLElement>('.crane-icon').forEach(el => {
+    el.setAttribute('data-rot', '0')
+    el.style.transform = 'rotate(0deg)'
+  })
+}
 
 // ---------------------------------------------------------------------------
 // --- Lifecycle ---
@@ -284,6 +324,11 @@ onMounted(async () => {
   await loadLayer('landmarks', `${base}/landmarks.geojson`, {
     pointToLayer(feature, latlng) {
       const lmType = feature.properties?.landmark_type ?? 'label'
+      const iconScale = lmType === 'qc-crane' ? 1.8 : 1
+      if (CRANE_TYPES.has(lmType)) {
+        return L.marker(latlng, { icon: makeCraneIcon(0, iconScale) })
+      }
+
       return L.circleMarker(latlng, {
         radius: 5,
         fillColor: LANDMARK_COLORS[lmType] ?? '#757575',
