@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const mapContainer = ref<HTMLElement | null>(null)
-const initialBearing = -37
+const initialBearing = -36.4
 const bearing = ref(initialBearing)
 let map: LeafletMap | null = null
 
