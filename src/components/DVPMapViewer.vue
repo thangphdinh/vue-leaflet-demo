@@ -73,6 +73,35 @@ const LANDMARK_COLORS: Record<string, string> = {
   'label': '#757575',
 }
 
+// --- Material Symbol per landmark type ---
+const LANDMARK_SYMBOLS: Record<string, string> = {
+  'customs-office': 'gavel',
+  '5f-office':      'apartment',
+  'parking':        'local_parking',
+  'power':          'bolt',
+  'equipment':      'precision_manufacturing',
+  'warehouse':      'warehouse',
+  'weightstation':  'scale',
+  'label':          'location_on',
+}
+
+function makeLandmarkIcon(type: string): L.DivIcon {
+  const color  = LANDMARK_COLORS[type] ?? '#757575'
+  const symbol = LANDMARK_SYMBOLS[type] ?? 'place'
+  return L.divIcon({
+    html: `<div style="width:28px;height:28px;background:${color};border-radius:50%;
+                       border:2px solid #fff;display:flex;align-items:center;
+                       justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.45)">
+             <span class="material-symbols-outlined"
+                   style="font-size:15px;color:#fff;line-height:1;user-select:none">${symbol}</span>
+           </div>`,
+    className: '',
+    iconSize:   [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor:[0, -16],
+  })
+}
+
 const CRANE_TYPES = new Set(['crane', 'qc-crane'])
 const CRANE_W = 18
 const CRANE_H = Math.round(CRANE_W * 402 / 144) // giữ tỷ lệ SVG gốc 144×402
@@ -329,13 +358,7 @@ onMounted(async () => {
         return L.marker(latlng, { icon: makeCraneIcon(0, iconScale) })
       }
 
-      return L.circleMarker(latlng, {
-        radius: 5,
-        fillColor: LANDMARK_COLORS[lmType] ?? '#757575',
-        color: '#fff',
-        weight: 2,
-        fillOpacity: 0.9,
-      })
+      return L.marker(latlng, { icon: makeLandmarkIcon(lmType) })
     },
     onEachFeature: (f, l) => l.bindPopup(popupLandmark(f.properties ?? {})),
   })
