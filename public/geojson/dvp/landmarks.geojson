@@ -1,0 +1,24 @@
+{
+"type": "FeatureCollection",
+"name": "landmarks",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "fid": 1, "bld_id": "HQ", "bld_name": "Văn phòng Hải quan", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "customs-office" }, "geometry": { "type": "Point", "coordinates": [ 106.766082788794762, 20.838995834054348 ] } },
+{ "type": "Feature", "properties": { "fid": 2, "bld_id": "5T", "bld_name": "Nhà 5 tầng", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "5f-office" }, "geometry": { "type": "Point", "coordinates": [ 106.766365738025272, 20.839361378161204 ] } },
+{ "type": "Feature", "properties": { "fid": 3, "bld_id": "PKL1", "bld_name": "Nhà xe", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "parking" }, "geometry": { "type": "Point", "coordinates": [ 106.766305336858863, 20.838748139238625 ] } },
+{ "type": "Feature", "properties": { "fid": 4, "bld_id": "TBA", "bld_name": "TBA", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "power" }, "geometry": { "type": "Point", "coordinates": [ 106.76789749266851, 20.837829338320486 ] } },
+{ "type": "Feature", "properties": { "fid": 5, "bld_id": "PKL2", "bld_name": "Nhà xe", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "parking" }, "geometry": { "type": "Point", "coordinates": [ 106.766616328969945, 20.839673006569058 ] } },
+{ "type": "Feature", "properties": { "fid": 6, "bld_id": "VEH", "bld_name": "Đội cơ giới", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "equipment" }, "geometry": { "type": "Point", "coordinates": [ 106.767954746999777, 20.841393857788059 ] } },
+{ "type": "Feature", "properties": { "fid": 7, "bld_id": "STORAGE", "bld_name": "Nhà kho (CFS & Bách hóa)", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "warehouse" }, "geometry": { "type": "Point", "coordinates": [ 106.768544491233101, 20.840667552096004 ] } },
+{ "type": "Feature", "properties": { "fid": 8, "bld_id": "A1", "bld_name": "A1 test", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "label" }, "geometry": { "type": "Point", "coordinates": [ 106.770521537618535, 20.841078533768027 ] } },
+{ "type": "Feature", "properties": { "fid": 9, "bld_id": "C1", "bld_name": "C1 test", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "label" }, "geometry": { "type": "Point", "coordinates": [ 106.771856821328328, 20.840105352738554 ] } },
+{ "type": "Feature", "properties": { "fid": 10, "bld_id": "QC01", "bld_name": "QC-01", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "qc-crane" }, "geometry": { "type": "Point", "coordinates": [ 106.771935182538797, 20.840702105877682 ] } },
+{ "type": "Feature", "properties": { "fid": 11, "bld_id": "QC02", "bld_name": "QC-02", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "qc-crane" }, "geometry": { "type": "Point", "coordinates": [ 106.771446798306314, 20.841038876980726 ] } },
+{ "type": "Feature", "properties": { "fid": 12, "bld_id": "CRANE01", "bld_name": "Crane 01", "remark": "aaaa", "rotation": 0.0, "scale": 1, "landmark_type": "crane" }, "geometry": { "type": "Point", "coordinates": [ 106.769482216603379, 20.842456345858132 ] } },
+{ "type": "Feature", "properties": { "fid": 13, "bld_id": "CRANE02", "bld_name": "Crane 02", "remark": "lolo", "rotation": 0.0, "scale": 1, "landmark_type": "crane" }, "geometry": { "type": "Point", "coordinates": [ 106.769737211762447, 20.842281079799971 ] } },
+{ "type": "Feature", "properties": { "fid": 14, "bld_id": "CRANE03", "bld_name": "Crane 03", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "crane" }, "geometry": { "type": "Point", "coordinates": [ 106.77032875134438, 20.84186936717666 ] } },
+{ "type": "Feature", "properties": { "fid": 15, "bld_id": "CRANE04", "bld_name": "Crane 04", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "crane" }, "geometry": { "type": "Point", "coordinates": [ 106.770585416946957, 20.841691836165662 ] } },
+{ "type": "Feature", "properties": { "fid": 16, "bld_id": "CRANE05", "bld_name": "Crane 05", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "crane" }, "geometry": { "type": "Point", "coordinates": [ 106.771127143844282, 20.841316607670851 ] } },
+{ "type": "Feature", "properties": { "fid": 17, "bld_id": "CAN", "bld_name": "Nhà cân", "remark": null, "rotation": 0.0, "scale": 1, "landmark_type": "weightstation" }, "geometry": { "type": "Point", "coordinates": [ 106.766926644545876, 20.839498059188347 ] } }
+]
+}

@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import LeafletMap from './components/LeafletMap.vue'
 import EgryiaMap from './components/EgryiaMap.vue'
 import EgryiaMapEditor from './components/EgryiaMapEditor.vue'
+import DVPMapViewer from './components/DVPMapViewer.vue'
 
 const center = ref<[number, number]>([21.0285, 105.8542])
 const zoom = ref(13)
@@ -51,7 +52,7 @@ const zoom = ref(13)
         </div>
 
         <!-- Egryia Fantasy Map -->
-        <div class="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl shadow-xl p-6">
+        <!-- <div class="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl shadow-xl p-6">
           <div class="mb-4">
             <h2 class="text-2xl font-semibold text-purple-900 mb-2 flex items-center gap-2">
               🌍 Egryia Fantasy Map
@@ -62,7 +63,7 @@ const zoom = ref(13)
           </div>
 
           <EgryiaMap height="600px" />
-        </div>
+        </div> -->
 
         <!-- Egryia Map Editor -->
         <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-xl p-6">
@@ -77,20 +78,19 @@ const zoom = ref(13)
 
           <EgryiaMapEditor height="600px" />
 
-          <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-green-100 p-4 rounded-lg border-2 border-green-300">
-              <h3 class="font-semibold text-green-900 mb-1">Click To Add</h3>
-              <p class="text-sm text-green-800">Click anywhere to add marker</p>
-            </div>
-            <div class="bg-emerald-100 p-4 rounded-lg border-2 border-emerald-300">
-              <h3 class="font-semibold text-emerald-900 mb-1">Drag & Drop</h3>
-              <p class="text-sm text-emerald-800">Drag markers to adjust position</p>
-            </div>
-            <div class="bg-teal-100 p-4 rounded-lg border-2 border-teal-300">
-              <h3 class="font-semibold text-teal-900 mb-1">Export JSON</h3>
-              <p class="text-sm text-teal-800">Copy coordinates to clipboard</p>
-            </div>
+        </div>
+        <!-- DVP GeoJSON Map -->
+        <div class="bg-white rounded-xl shadow-xl p-6">
+          <div class="mb-4">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-2">
+              DVP Map (GeoJSON)
+            </h2>
+            <p class="text-gray-500 text-sm">
+              Load dữ liệu các layer GeoJSON & hiển thị polygon trên nền OpenStreetMap
+            </p>
           </div>
+
+          <DVPMapViewer height="600px" />
         </div>
       </main>
     </div>
