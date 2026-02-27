@@ -4,9 +4,10 @@ import L from 'leaflet'
 import 'leaflet-rotate'
 import type { Map as LeafletMap } from 'leaflet'
 import {
-  CRANE_TYPES, makeCraneIcon, makeLandmarkIcon,
+  CRANE_TYPES, makeCraneIcon, makeAnimatedCraneIcon, makeLandmarkIcon,
   styleBoundary, styleBlock, styleArea, styleRoad, styleBuilding,
-  popupBlock, popupArea, popupRoad, popupBuilding, popupLandmark,
+  popupBlock, popupArea, popupRoad, popupBuilding, popupLandmark, 
+  popupActiveCrane, tooltipActiveCrane,
 } from '@/layers/dvp-layers'
 
 interface Props {
@@ -26,6 +27,7 @@ const layerVisibility = reactive<Record<string, boolean>>({
   yard_road: true,
   building: true,
   landmarks: true,
+  active_cranes: true,
 })
 
 const layerLabels: Record<string, string> = {
@@ -35,10 +37,29 @@ const layerLabels: Record<string, string> = {
   yard_road:     'Đường nội bộ',
   building:      'Tòa nhà',
   landmarks:     'Điểm mốc',
+  active_cranes: 'Xe cẩu đang hoạt động',
 }
 
 const featureCounts = reactive<Record<string, number>>({})
 const layerInstances = new Map<string, L.GeoJSON>()
+
+// --- Active Cranes Management ---
+interface ActiveCrane {
+  deviceId: string
+  deviceName?: string
+  device_name?: string
+  lat: number
+  lng: number
+  speed?: number
+  location?: string
+  area?: string
+  block?: string
+  lastUpdate: string
+  [key: string]: unknown
+}
+
+const activeCranes = reactive<Map<string, ActiveCrane>>(new Map())
+const activeCraneMarkers = new Map<string, L.Marker>()
 
 // --- Highlight ---
 let highlightedLayer: L.Path | null = null
@@ -91,9 +112,90 @@ async function loadLayer(name: string, url: string, options: L.GeoJSONOptions) {
 
 function toggleLayer(name: string) {
   layerVisibility[name] = !layerVisibility[name]
+  
+  // Xử lý riêng cho active_cranes (không phải GeoJSON layer)
+  if (name === 'active_cranes') {
+    activeCraneMarkers.forEach(marker => {
+      if (!map) return
+      layerVisibility[name] ? marker.addTo(map) : map.removeLayer(marker)
+    })
+    return
+  }
+  
+  // Xử lý các GeoJSON layers thông thường
   const layer = layerInstances.get(name)
   if (!layer || !map) return
   layerVisibility[name] ? layer.addTo(map) : map.removeLayer(layer)
+}
+
+// --- Active Cranes ---
+function addOrUpdateActiveCrane(crane: ActiveCrane) {
+  if (!map) return
+
+  const existingMarker = activeCraneMarkers.get(crane.deviceId)
+  
+  if (existingMarker) {
+    // Update existing marker position
+    existingMarker.setLatLng([crane.lat, crane.lng])
+    existingMarker.setPopupContent(popupActiveCrane(crane))
+    existingMarker.setTooltipContent(tooltipActiveCrane(crane))
+    activeCranes.set(crane.deviceId, crane)
+  } else {
+    // Create new marker with animated icon
+    const iconScale = 1.8
+    const marker = L.marker([crane.lat, crane.lng], {
+      icon: makeAnimatedCraneIcon(0, iconScale),
+      zIndexOffset: 1000, // Đảm bảo hiển thị trên các layer khác
+    })
+    
+    // Bind popup (click để xem chi tiết)
+    marker.bindPopup(popupActiveCrane(crane))
+    
+    // Bind tooltip (hover để xem thông tin nhanh)
+    marker.bindTooltip(tooltipActiveCrane(crane), {
+      permanent: false,
+      direction: 'top',
+      offset: [0, -10],
+      className: 'active-crane-tooltip-wrapper',
+      opacity: 0.95,
+    })
+    
+    marker.addTo(map)
+    
+    activeCraneMarkers.set(crane.deviceId, marker)
+    activeCranes.set(crane.deviceId, crane)
+    featureCounts.active_cranes = activeCranes.size
+  }
+}
+
+function removeActiveCrane(deviceId: string) {
+  const marker = activeCraneMarkers.get(deviceId)
+  if (marker && map) {
+    map.removeLayer(marker)
+    activeCraneMarkers.delete(deviceId)
+    activeCranes.delete(deviceId)
+    featureCounts.active_cranes = activeCranes.size
+  }
+}
+
+function updateActiveCranePosition(deviceId: string, lat: number, lng: number, speed?: number) {
+  const crane = activeCranes.get(deviceId)
+  if (crane) {
+    crane.lat = lat
+    crane.lng = lng
+    if (speed !== undefined) crane.speed = speed
+    crane.lastUpdate = new Date().toISOString()
+    addOrUpdateActiveCrane(crane)
+  }
+}
+
+// Function để nhận dữ liệu từ server (WebSocket hoặc polling)
+// Bạn có thể thay thế bằng WebSocket hoặc API call thực tế
+function handleCraneDataFromServer(data: ActiveCrane | ActiveCrane[]) {
+  const cranes = Array.isArray(data) ? data : [data]
+  cranes.forEach(crane => {
+    addOrUpdateActiveCrane(crane)
+  })
 }
 
 // --- Rotation ---
@@ -192,9 +294,50 @@ onMounted(async () => {
   }
 
   map.setBearing(initialBearing)
+
+  // Demo: Thêm một số xe cẩu đang hoạt động (mock data)
+  // Bạn có thể xóa phần này và thay bằng dữ liệu thực từ server
+  setTimeout(() => {
+    const boundaryLayer = layerInstances.get('yard_boundary')
+    if (boundaryLayer && map) {
+      const bounds = boundaryLayer.getBounds()
+      const center = bounds.getCenter()
+      
+      // Thêm 2 xe cẩu demo với đầy đủ thông tin
+      handleCraneDataFromServer([
+        {
+          deviceId: 'CRANE-001',
+          deviceName: 'Xe cẩu STS-01',
+          lat: center.lat + 0.0005,
+          lng: center.lng + 0.0003,
+          speed: 5.2,
+          location: 'Khu vực A - Block 12',
+          area: 'Khu vực A',
+          block: 'Block 12',
+          lastUpdate: new Date().toISOString(),
+        },
+        {
+          deviceId: 'CRANE-002',
+          deviceName: 'Xe cẩu RTG-05',
+          lat: center.lat - 0.0004,
+          lng: center.lng - 0.0002,
+          speed: 3.8,
+          location: 'Khu vực B - Block 8',
+          area: 'Khu vực B',
+          block: 'Block 8',
+          lastUpdate: new Date().toISOString(),
+        },
+      ])
+    }
+  }, 1000)
 })
 
 onUnmounted(() => {
+  activeCraneMarkers.forEach(marker => {
+    if (map) map.removeLayer(marker)
+  })
+  activeCraneMarkers.clear()
+  activeCranes.clear()
   layerInstances.forEach(layer => layer.off())
   layerInstances.clear()
   if (map) { map.off(); map.remove(); map = null }
@@ -253,5 +396,82 @@ const totalFeatures = () => Object.values(featureCounts).reduce((a, b) => a + b,
   color: #333 !important;
   text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
   white-space: nowrap;
+}
+
+/* Animation cho xe cẩu đang hoạt động */
+.animated-crane-container {
+  position: relative;
+  display: inline-block;
+}
+
+.animated-crane-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(76, 175, 80, 0.4);
+  border: 3px solid rgba(76, 175, 80, 0.8);
+  animation: cranePulse 2s ease-out infinite;
+  z-index: 1;
+}
+
+.animated-crane-icon {
+  animation: craneBlink 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(76, 175, 80, 0.8));
+}
+
+@keyframes cranePulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes craneBlink {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px rgba(76, 175, 80, 0.8)) brightness(1);
+  }
+  50% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 8px rgba(76, 175, 80, 1)) brightness(1.2);
+  }
+}
+
+/* Styling cho tooltip của active crane */
+.active-crane-tooltip-wrapper {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border: 2px solid #4CAF50 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  padding: 8px 10px !important;
+  font-size: 12px !important;
+  max-width: 220px !important;
+  pointer-events: none !important;
+  transition: opacity 0.2s ease-in-out !important;
+}
+
+.active-crane-tooltip-wrapper::before {
+  border-top-color: #4CAF50 !important;
+}
+
+.active-crane-tooltip {
+  line-height: 1.4;
+}
+
+.active-crane-tooltip b {
+  color: #1976D2;
+  font-weight: 600;
 }
 </style>
